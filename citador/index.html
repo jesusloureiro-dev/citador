@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Citador para Word</title>
+  <link rel="icon" href="assets/icon-32.png">
+  <style>
+    :root { --ink:#173b44; --ink2:#2b5964; --text:#1b2528; --muted:#5d6b6e; --rule:#d8e0de; --wash:#f1f5f4; --hl:#ffe066; --hl-soft:#fff5c2; --warn:#a8322a;
+      --ui:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; --serif:Cambria,Georgia,serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.6 var(--ui); color: var(--text); background: #fff; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+    h1 { font-family: var(--serif); font-size: 44px; line-height: 1.1; margin: 0 0 12px; color: var(--ink); }
+    h1 .mark { background: linear-gradient(transparent 55%, var(--hl) 55%, var(--hl) 92%, transparent 92%); padding: 0 4px; }
+    .lead { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 36px; }
+    h2 { font-size: 20px; margin: 44px 0 10px; color: var(--ink); }
+    ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+    ol.steps > li { counter-increment: s; position: relative; padding: 0 0 26px 52px; border-left: 2px solid var(--rule); margin-left: 16px; }
+    ol.steps > li:last-child { border-left-color: transparent; }
+    ol.steps > li::before { content: counter(s); position: absolute; left: -17px; top: -2px; width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+    ol.steps h3 { margin: 0 0 4px; font-size: 17px; }
+    ol.steps p { margin: 4px 0; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: #fff; border: 0; border-radius: 6px; padding: 10px 18px; font: 600 15px var(--ui); cursor: pointer; text-decoration: none; margin: 8px 8px 4px 0; }
+    .btn:hover { background: var(--ink2); }
+    .btn.ghost { background: #fff; color: var(--ink); border: 1px solid var(--rule); }
+    .btn.ghost:hover { border-color: var(--ink); }
+    .addr { font: 14px Consolas, monospace; background: var(--wash); padding: 6px 10px; border-radius: 4px; word-break: break-all; display: inline-block; }
+    .note { background: var(--hl-soft); border-left: 3px solid var(--hl); padding: 10px 14px; margin: 12px 0; font-size: 15px; }
+    .bad { background: #fbeceb; border-left-color: var(--warn); }
+    .muted { color: var(--muted); }
+    details { border-top: 1px solid var(--rule); padding: 12px 0; }
+    details:last-of-type { border-bottom: 1px solid var(--rule); }
+    summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+    details ol, details ul { margin: 8px 0; }
+    .use { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin-top: 12px; }
+    .use div h3 { margin: 0 0 2px; font-size: 16px; }
+    .use div p { margin: 0; color: var(--muted); font-size: 15px; }
+    .os { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; padding: 3px; gap: 3px; margin-top: 8px; }
+    .ostab { border: 0; background: none; padding: 7px 18px; border-radius: 6px; font: 600 15px var(--ui); color: var(--muted); cursor: pointer; }
+    .ostab.is-on { background: var(--ink); color: #fff; }
+    .copied { margin-left: 6px; color: var(--ink); font-weight: 600; }
+    kbd { font: 13px Consolas, monospace; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; }
+    footer { margin-top: 56px; font-size: 13px; color: var(--muted); }
+    @media (max-width: 600px) { h1 { font-size: 34px; } .use { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1><span class="mark">[1]</span> Citador</h1>
+    <p class="lead">Un gestor de referencias dentro de Word. Pega un PMID o un DOI, cita con un doble clic y cambia el aspecto de todas las citas y de la bibliografía en un segundo.</p>
+
+    <div id="checkHost"></div>
+
+    <div class="os" role="tablist" aria-label="Sistema operativo">
+      <button class="ostab" data-os="win" role="tab">Windows</button>
+      <button class="ostab" data-os="mac" role="tab">Mac</button>
+    </div>
+
+    <section id="os-win">
+      <h2 style="margin-top:20px">Instalación en Word para Windows</h2>
+      <ol class="steps">
+        <li>
+          <h3>Descarga el instalador</h3>
+          <p>Es un pequeño archivo que registra Citador en tu Word. No necesita permisos de administrador.</p>
+          <button class="btn" id="dlInstall">Descargar instalar-citador.cmd</button>
+        </li>
+        <li>
+          <h3>Ejecútalo</h3>
+          <p>Haz doble clic en el archivo descargado. Si Windows muestra «Windows protegió su PC», pulsa <em>Más información</em> y después <em>Ejecutar de todas formas</em>: aparece porque el archivo no está firmado.</p>
+        </li>
+        <li>
+          <h3>Reinicia Word</h3>
+          <p>Cierra todas las ventanas de Word y ábrelo de nuevo. En la pestaña <strong>Inicio</strong>, a la derecha, verás el botón <strong>Citas y bibliografía</strong>.</p>
+          <p class="muted">Si no aparece: <em>Inicio → Complementos → Más complementos → Mis complementos → Complementos de desarrollador → Citador</em>.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="os-mac">
+      <h2 style="margin-top:20px">Instalación en Word para Mac</h2>
+      <p class="muted">macOS 12 Monterey o posterior, con Word de Microsoft 365, 2019, 2021 o 2024.</p>
+      <ol class="steps">
+        <li>
+          <h3>Copia el comando de instalación</h3>
+          <p>Coloca Citador en la carpeta de complementos de Word. No toca nada más de tu Mac ni pide contraseña.</p>
+          <button class="btn" id="copyMac">Copiar comando</button>
+          <span class="copied" id="copiedMac" hidden>Copiado</span>
+        </li>
+        <li>
+          <h3>Pégalo en Terminal</h3>
+          <p>Abre <strong>Terminal</strong> (pulsa <kbd>Cmd</kbd>+<kbd>Espacio</kbd>, escribe «Terminal» y pulsa <kbd>Intro</kbd>), pega con <kbd>Cmd</kbd>+<kbd>V</kbd> y pulsa <kbd>Intro</kbd>. Verás «Citador instalado».</p>
+        </li>
+        <li>
+          <h3>Reinicia Word</h3>
+          <p>Cierra Word del todo con <kbd>Cmd</kbd>+<kbd>Q</kbd> y ábrelo. Abre un documento: en la pestaña <strong>Inicio</strong> verás <strong>Citas y bibliografía</strong>.</p>
+          <p class="muted">Si no aparece: <em>Insertar → Complementos → Mis complementos</em> (o el menú desplegable junto a <em>Complementos</em>) y elige Citador.</p>
+        </li>
+      </ol>
+      <details>
+        <summary>Prefiero no usar Terminal</summary>
+        <ol>
+          <li><button class="btn ghost" id="dlManifestMac">Descargar manifest.xml</button></li>
+          <li>En Finder, pulsa <kbd>Cmd</kbd>+<kbd>Mayús</kbd>+<kbd>G</kbd>, pega <span class="addr" id="macDir"></span> y pulsa <kbd>Intro</kbd>. Si dice que la carpeta no existe, abre la carpeta <em>Documents</em> que aparece en esa ruta y crea dentro una carpeta llamada <strong>wef</strong>.</li>
+          <li>Arrastra <em>manifest.xml</em> a la carpeta <strong>wef</strong> y reinicia Word.</li>
+        </ol>
+      </details>
+    </section>
+
+    <p><a class="btn ghost" href="taskpane.html?demo=1">Probar en el navegador sin instalar</a></p>
+
+    <h2>Cómo se usa</h2>
+    <div class="use">
+      <div><h3>Citar</h3><p>Pon el cursor en el texto, elige referencias en el panel y pulsa <em>Insertar cita</em> (o doble clic).</p></div>
+      <div><h3>Añadir referencias</h3><p>Pega PMID o DOI en el buscador y pulsa <kbd>Intro</kbd>: se importan y se citan a la vez. También busca en PubMed.</p></div>
+      <div><h3>Cambiar el aspecto</h3><p>En <em>Formato</em>, elige [1], (1), superíndice, (Autor, año)… y el estilo de la bibliografía. Todo el documento se actualiza solo.</p></div>
+      <div><h3>Crear el estilo de una revista</h3><p>Pega unas referencias copiadas de un artículo de la revista: Citador deduce el formato, comprueba que las reproduce y lo guarda con el nombre que quieras.</p></div>
+      <div><h3>Una biblioteca por artículo</h3><p>Las referencias de cada documento viajan dentro del .docx. Quien lo abra con Citador las tendrá todas. También puedes exportarlas como archivo .citador.</p></div>
+      <div><h3>Editar una cita</h3><p>Haz clic dentro de una cita del documento: el panel te deja quitar referencias, añadir páginas o convertirla en narrativa.</p></div>
+      <div><h3>Importar tu biblioteca</h3><p>Exporta desde EndNote, Mendeley o Zotero en RIS o BibTeX, o desde PubMed en formato .nbib, y súbelo en <em>Biblioteca</em>.</p></div>
+      <div><h3>Versión para la revista</h3><p><em>Formato → Convertir en texto normal</em> deja citas y bibliografía como texto fijo. Hazlo en una copia.</p></div>
+    </div>
+
+    <h2>Otras formas de instalar</h2>
+    <details>
+      <summary>Word en el navegador (Microsoft 365 web)</summary>
+      <ol>
+        <li><button class="btn ghost" id="dlManifest">Descargar manifest.xml</button></li>
+        <li>En Word: <em>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</em>.</li>
+        <li>Elige el archivo <em>manifest.xml</em>.</li>
+      </ol>
+    </details>
+    <details>
+      <summary>Desinstalar</summary>
+      <p><strong>Windows:</strong> ejecuta el desinstalador y reinicia Word.</p>
+      <button class="btn ghost" id="dlUninstall">Descargar desinstalar-citador.cmd</button>
+      <p><strong>Mac:</strong> pega este comando en Terminal y reinicia Word.</p>
+      <button class="btn ghost" id="copyMacUn">Copiar comando de desinstalación</button>
+      <p class="muted">Tus referencias guardadas en los documentos no se pierden.</p>
+    </details>
+    <details>
+      <summary>¿Dónde se guardan mis referencias?</summary>
+      <p>Tu biblioteca se guarda en este ordenador, dentro de Word. Además, cada documento lleva dentro las referencias que cita: si se lo pasas a un coautor que también usa Citador, verá y podrá editar las mismas citas.</p>
+      <p>Para tener una copia de seguridad o pasar la biblioteca a otro ordenador, usa <em>Biblioteca → Exportar RIS</em>.</p>
+    </details>
+
+    <footer>
+      Los datos de PubMed proceden de NCBI y los de DOI, de Crossref y DataCite.
+    </footer>
+  </div>
+
+  <script src="js/install.js"></script>
+  <script>
+    (function () {
+      var base = CitadorInstall.baseUrl();
+      var box = document.getElementById("checkHost");
+      var https = /^https:\/\//.test(base) || /^https?:\/\/localhost[:/]/.test(base);
+      if (!https) {
+        box.innerHTML = "<div class='note bad'><strong>Esta página no está publicada en una dirección https.</strong> Word solo carga complementos desde direcciones seguras. Sube la carpeta de Citador a GitHub Pages (o a otro alojamiento con https) y abre esta página desde allí para descargar el instalador.</div>";
+      } else {
+        box.innerHTML = "<p class='muted'>Citador se cargará desde <span class='addr'>" + base.replace(/</g, "&lt;") + "</span></p>";
+      }
+      document.getElementById("dlInstall").onclick = function () {
+        CitadorInstall.download("instalar-citador.cmd", CitadorInstall.installer(base), "application/octet-stream");
+      };
+      document.getElementById("dlManifest").onclick = function () {
+        CitadorInstall.download("manifest.xml", CitadorInstall.manifest(base), "text/xml");
+      };
+      function copyText(text, flag) {
+        function done() { if (flag) { flag.hidden = false; setTimeout(function () { flag.hidden = true; }, 2500); } }
+        if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else fallback();
+        function fallback() {
+          var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); done(); } catch (e) { prompt("Copia este comando:", text); }
+          ta.remove();
+        }
+      }
+      document.getElementById("copyMac").onclick = function () { copyText(CitadorInstall.macCommand(base), document.getElementById("copiedMac")); };
+      document.getElementById("copyMacUn").onclick = function () { copyText(CitadorInstall.macUninstallCommand(), null); this.textContent = "Copiado"; };
+      document.getElementById("macDir").textContent = CitadorInstall.MAC_DIR;
+      document.getElementById("dlManifestMac").onclick = function () {
+        CitadorInstall.download("manifest.xml", CitadorInstall.manifest(base), "text/xml");
+      };
+      function showOs(os) {
+        ["win", "mac"].forEach(function (o) {
+          document.getElementById("os-" + o).hidden = o !== os;
+          var t = document.querySelector(".ostab[data-os='" + o + "']");
+          t.classList.toggle("is-on", o === os); t.setAttribute("aria-selected", o === os);
+        });
+      }
+      Array.prototype.forEach.call(document.querySelectorAll(".ostab"), function (t) {
+        t.onclick = function () { showOs(t.getAttribute("data-os")); };
+      });
+      showOs(/Mac/.test(navigator.platform) || /Mac OS X/.test(navigator.userAgent) ? "mac" : "win");
+      document.getElementById("dlUninstall").onclick = function () {
+        CitadorInstall.download("desinstalar-citador.cmd", CitadorInstall.uninstaller(), "application/octet-stream");
+      };
+    })();
+  </script>
+</body>
+</html>
